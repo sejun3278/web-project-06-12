@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
+import ReactDOM from 'react-dom';
 import { Grid } from '@material-ui/core'
 import axios from 'axios';
 // import addData from './addData.js'
@@ -12,52 +13,71 @@ class App extends Component {
       update : false,
       allow : false,
       show : 8,
-      scroll : window.innerHeight,
+      loading : false,
+    }
+  }
+
+  componentDidUpdate() {
+    const { update, scrap, loading, show } = this.state;
+    const scrapArr = JSON.parse(localStorage.getItem('scrap'))
+  
+    if(update) {
+      this.setState({ update : false })
+    }
+  
+    if(scrap) {
+      if(scrapArr.length === 0) {
+        this.setState({ scrap : false })
+      }
+    }
+
+    if(loading) {
+      this.setState({ loading : false, show : show + 4 })
     }
   }
 
 componentDidMount() {
-  this._addDate();
   window.addEventListener('scroll', this._handleScroll);
 }
 
-componentWillUnmount() {
-  window.removeEventListener('scroll', this._handleScroll);
+shouldComponentUpdate() {
+  const { loading } = this.state;
+  //example 특정컴포넌트의 최상단(top)이 스크롤하여 가려져서 안보이게 되면(top<0) 특정 액션 실행하는 메소드
+  const top = ReactDOM.findDOMNode(this).getBoundingClientRect().top;
+  // alert(top)
+
+  if(top < -40 && loading === false) {
+    this.setState({ loading : true })
+  }
+  // (top < 0) && 특정 액션 실행;
+  return true;
 }
 
-componentDidUpdate() {
-  const { update, scrap } = this.state;
-  const scrapArr = JSON.parse(localStorage.getItem('scrap'))
+_handleScroll = (e) => {
+  const scrollTop = ('scroll', e.srcElement.scrollingElement.scrollTop);
+    this.setState({ scrollTop });
+  // const { innerHeight } = window;
+  // const { scrollHeight } = document.body;
+  
+  // const scrollTop =
+  //   (document.documentElement && document.documentElement.scrollTop) ||
+  //   document.body.scrollTop;
 
-  if(update) {
-    this.setState({ update : false })
-  }
-
-  if(scrap) {
-    if(scrapArr.length === 0) {
-      this.setState({ scrap : false })
-    }
-  }
-}
-
-_handleScroll(event) {
-  // let cover = 6 * this.state.show;
-  let scroll = window.scrollY
-  console.log(scroll)
-
-  // if(cover > scroll - 20) {
-  //   this.setState({ show : this.state.show + 4 })
-  // }
-  // let scrollTop = event.srcElement.body.scrollTop
-      // itemTranslate = Math.min(0, scrollTop/ 3 - 60);
-  // console.log(scrollTop)
+  //   if (scrollHeight - innerHeight - scrollTop < 50) {
+  //     this.setState({ scrollTop });
+  //     // sessionStorage.setItem('addShow', Number(sessionStorage.getItem('addShow')) + 4)
+  //   }
 }
 
 _addDate = async () => {
   const res = await axios.get('/get/data');
 
   if(res.data) {
-    return sessionStorage.setItem('data', JSON.stringify(res.data));
+    sessionStorage.setItem('data', JSON.stringify(res.data));
+
+    setTimeout( () => {
+      return window.location.reload();
+    }, 800);
   }
 }
 
@@ -93,9 +113,16 @@ _filterArr(data, arr) {
 
 render() {
   const { scrap, show, scroll } = this.state;
-  console.log(scroll)
+  if(sessionStorage.getItem('addShow') === null) {
+    sessionStorage.setItem('addShow', 8);
+  }
+  sessionStorage.setItem('addShow', sessionStorage.getItem('addShow'));
 
   const data = JSON.parse(sessionStorage.getItem('data'))
+  if(data === null) {
+    this._addDate();
+  }
+
   if(localStorage.getItem('scrap') === null) {
     localStorage.setItem('scrap', JSON.stringify([]))
   }
