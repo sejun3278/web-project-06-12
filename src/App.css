@@ -84,3 +84,40 @@ input[type=checkbox]:checked + span::after{
   position: relative;
   margin-top: 8%;
 }
+
+#show_pictures_cards {
+  margin-top: 4%;
+}
+
+#show_pictures_card_tool {
+  display: grid;
+  grid-template-columns: repeat(4, 25%)
+}
+
+.users_profile_image {
+  width: 36px;
+}
+
+.users_nicknames {
+  position: relative;
+  top: -12px;
+  margin-left: 5px;
+  text-decoration: none;
+  font-size: 15px;
+}
+
+.users_url_image {
+  margin-top: 10px;
+  width: 85%;
+  height: 85%;
+  border-radius: 10px;
+  margin-bottom: 30px;
+}
+
+.users_scrap_image {
+  position: relative;
+  width: 12%;
+  right: 15%;
+  top: -40px;
+  /* left */
+}
