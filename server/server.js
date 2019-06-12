@@ -5,6 +5,9 @@ const path = require('path');
 const PORT = process.env.PORT || 4000;
 const morgan = require('morgan');
 
+const sequelize = require('./models').sequelize;
+sequelize.sync();
+
 app.use(express.static(path.join(__dirname, '..', 'public/')));
 app.use(morgan('combined'));
 
