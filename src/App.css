@@ -79,3 +79,8 @@ input[type=checkbox]:checked + span::after{
   right: 10px;
   top: 6px;
 }
+
+#loading_data {
+  position: relative;
+  margin-top: 8%;
+}

@@ -36,4 +36,5 @@ const config = require(path.join(__dirname, '..', 'config', 'config.json'))[
 
     db.Picture = require('./picture')(sequelize, Sequelize);
 
+    db.secret = '(9*)5$&!3%^0%^@@2$1!#5@2!4';
     module.exports = db;
