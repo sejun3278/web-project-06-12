@@ -10,24 +10,47 @@ class App extends Component {
     this.state = {
       scrap : false,
       update : false,
+      allow : false,
+      show : 8,
+      scroll : window.innerHeight,
     }
   }
 
 componentDidMount() {
   this._addDate();
-  
-  
-  if(localStorage.getItem('scrap') === null) {
-    localStorage.setItem('scrap', JSON.stringify([]))
-  }
+  window.addEventListener('scroll', this._handleScroll);
+}
+
+componentWillUnmount() {
+  window.removeEventListener('scroll', this._handleScroll);
 }
 
 componentDidUpdate() {
-  const { update } = this.state;
+  const { update, scrap } = this.state;
+  const scrapArr = JSON.parse(localStorage.getItem('scrap'))
 
   if(update) {
     this.setState({ update : false })
   }
+
+  if(scrap) {
+    if(scrapArr.length === 0) {
+      this.setState({ scrap : false })
+    }
+  }
+}
+
+_handleScroll(event) {
+  // let cover = 6 * this.state.show;
+  let scroll = window.scrollY
+  console.log(scroll)
+
+  // if(cover > scroll - 20) {
+  //   this.setState({ show : this.state.show + 4 })
+  // }
+  // let scrollTop = event.srcElement.body.scrollTop
+      // itemTranslate = Math.min(0, scrollTop/ 3 - 60);
+  // console.log(scrollTop)
 }
 
 _addDate = async () => {
@@ -38,43 +61,51 @@ _addDate = async () => {
   }
 }
 
-_addScrap(el) {
+_addScrap(e) {
   let origin = JSON.parse(localStorage.getItem('scrap'));
-  let check = origin.includes(el);
+  let check = origin.includes(e.id);
+
   this.setState({ update : true })
 
   if(!check) {
-    origin.push(el);
+    origin.push(e.id);
     localStorage.setItem('scrap', JSON.stringify(origin))
 
   } else {
-    let index = origin.indexOf(el);
-    origin[index] = null;
+    const result = origin.filter(el => el !== e.id);
+    localStorage.setItem('scrap', JSON.stringify(result))
+  }
+}
 
-    let cover = [];
-    origin.forEach( (el) => {
-      if(el !== null) {
-        cover.push(el);
-      }
-    })
-    localStorage.setItem('scrap', JSON.stringify(cover))
+_filterArr(data, arr) {
+  if(arr.length === 0) {
+    return data;
   }
 
-  // const findClass = document.getElementsByClassName(el);
-  // this.setState({ update : true })
-
-  // if(findClass[0].classList.contains('on') === false) {
-  //   findClass[0].classList.add('on')
-
-  // } else {
-  //   findClass[0].classList.remove('on')
-  // }
+  let cover = [];
+  for(let i = 0; i < data.length; i++) {
+    if(arr.includes(data[i].id)) {
+      cover.push(data[i]);
+    }
+  }
+  return cover;
 }
 
 render() {
-  const { scrap } = this.state;
+  const { scrap, show, scroll } = this.state;
+  console.log(scroll)
+
   const data = JSON.parse(sessionStorage.getItem('data'))
+  if(localStorage.getItem('scrap') === null) {
+    localStorage.setItem('scrap', JSON.stringify([]))
+  }
+
   const scrapArr = JSON.parse(localStorage.getItem('scrap'))
+
+  let filter = data;
+  if(scrap) {
+    filter = this._filterArr(data, scrapArr);
+  }
 
   if(data === null) {
     return(
@@ -91,12 +122,16 @@ render() {
       <Grid container={true} id='only_show_scrap'>
         <Grid item={true} xs={1}/>
         <Grid item={true}>
-          <input type='checkbox' id='show_scrap_button' onChange={() => this.setState({ scrap : !scrap })}/>
+          <input type='checkbox' id='show_scrap_button' 
+                 disabled={scrapArr.length !== 0 ? false : true}
+                 checked={scrapArr.length && scrap}
+                 onChange={() => this.setState({ scrap : !scrap })}/>
           <span> </span>
             <label htmlFor='show_scrap_button' defaultChecked={scrap} id='scrap_notice'
                    style={ scrap ? { fontWeight : 'bold' } : null}
+                   style={ scrapArr.length !== 0 ? { color : 'black' } : { color : '#ababab' } }
             > 
-              스크랩한 것만 보기 
+              스크랩한 것만 보기 ({scrapArr.length})
             </label>
         </Grid>
       <br />
@@ -104,24 +139,27 @@ render() {
           <Grid item={true} xs={1} />
 
           <Grid item={true} xs={10} id='show_pictures_card_tool'>
-            {data.map( (el, i) => {
+            {filter.map( (el, i) => {
               let check = scrapArr.includes(el.id);
+              
+              if(i < show) {
+                return(
+                  <Grid key={el.id}>
+                    <img className='users_profile_image' src={el.profile_image_url}/>
+                    <u className='users_nicknames'> {el.nickname} </u>
 
-              return(
-                <Grid key={el.id}>
-                  <img className='users_profile_image' src={el.profile_image_url}/>
-                  <u className='users_nicknames'> {el.nickname} </u>
-
-                  <Grid>
-                    <img className='users_url_image' src={el.image_url}/>
-                    <img className={'users_scrap_image ' + el.id}
-                         onClick={() => this._addScrap(el.id)}
-                          src={check ? require('./img/blue@2x.png') : require('./img/on-img@2x.png')}
-                         //  src={() => this._checkScrap(el.id)}
-                         />
+                    <Grid>
+                      <img className='users_url_image' src={el.image_url}/>
+                      <img className={'users_scrap_image ' + el.id}
+                          onClick={() => this._addScrap(el)}
+                          // src={require('./img/on-img@2x.png')}
+                            src={check ? require('./img/blue@2x.png') : require('./img/on-img@2x.png')}
+                          //  src={() => this._checkScrap(el.id)}
+                          />
+                    </Grid>
                   </Grid>
-                </Grid>
-              )
+                )
+              }
             })}
           </Grid>
           
