@@ -2,7 +2,7 @@
 
 사용 스택 : React, Nodejs(Express, Sequelize), Mysql(AWS RDS)
 
-!! 실행은 'yarn dev'로 실행해주세요.
+!! 'npm install' 후 'yarn dev'로 실행해주세요.
 
 ● 진행 과정 
 

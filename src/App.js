@@ -150,9 +150,10 @@ render() {
         <Grid item={true} xs={1}/>
         <Grid item={true}>
           <input type='checkbox' id='show_scrap_button' 
-                 disabled={scrapArr.length !== 0 ? false : true}
+                //  onClick={() => alert(22)}
+                //  disabled={scrapArr.length !== 0 ? false : true}
                  checked={scrapArr.length && scrap}
-                 onChange={() => this.setState({ scrap : !scrap })}/>
+                 onChange={scrapArr.length === 0 ? () => alert('스크랩된 목록이 하나도 없습니다.') : () => this.setState({ scrap : !scrap })}/>
           <span> </span>
             <label htmlFor='show_scrap_button' defaultChecked={scrap} id='scrap_notice'
                    style={ scrap ? { fontWeight : 'bold' } : null}
