@@ -91,7 +91,8 @@ input[type=checkbox]:checked + span::after{
 
 #show_pictures_card_tool {
   display: grid;
-  grid-template-columns: repeat(4, 25%)
+  grid-template-columns: repeat(4, 25%);
+  height: 160%;
 }
 
 .users_profile_image {

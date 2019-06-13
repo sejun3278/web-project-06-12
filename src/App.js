@@ -41,12 +41,23 @@ componentDidMount() {
 }
 
 shouldComponentUpdate() {
-  const { loading, show } = this.state;
+  const { loading } = this.state;
   //example 특정컴포넌트의 최상단(top)이 스크롤하여 가려져서 안보이게 되면(top<0) 특정 액션 실행하는 메소드
-  const top = ReactDOM.findDOMNode(this).getBoundingClientRect().top;
-  const rule = show * -5
+  // const top = ReactDOM.findDOMNode(this).getBoundingClientRect().top;
+  // console.log(top)
 
-  if(top < rule && loading === false) {
+  let scrollHeight = Math.max(document.documentElement.scrollHeight, document.body.scrollHeight);
+  let scrollTop = Math.max(document.documentElement.scrollTop, document.body.scrollTop);
+  console.log('스크롤위치 : ' + scrollTop)
+  console.log('스크롤길이 : ' + scrollHeight)
+  const clientHeight = document.documentElement.clientHeight;
+  console.log('클라길이 : ' + clientHeight)
+
+  let top = clientHeight + scrollTop;
+  top = Math.ceil(top)
+
+  // 스크롤바가 최하단까지 왔을 때 실행한다.
+  if(top >= scrollHeight && loading === false) {
     this.setState({ loading : true })
   }
   // (top < 0) && 특정 액션 실행;
@@ -101,7 +112,7 @@ _filterArr(data, arr) {
 }
 
 render() {
-  const { scrap, show, scroll } = this.state;
+  const { scrap, show } = this.state;
   if(sessionStorage.getItem('addShow') === null) {
     sessionStorage.setItem('addShow', 12);
   }
